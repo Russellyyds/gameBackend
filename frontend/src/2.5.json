@@ -1,0 +1,156 @@
+{
+  "title": "知识竞赛",
+  "description": "测试你的一般知识水平！",
+  "questions": [
+    {
+      "id": "1744798001001",
+      "text": "法国的首都是什么？",
+      "type": "single",
+      "duration": 20,
+      "points": 10,
+      "correctAnswers": ["1"],
+      "answers": [
+        {
+          "id": 1,
+          "text": "巴黎",
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "text": "伦敦",
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "text": "柏林",
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "text": "罗马",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "1744798001002",
+      "text": "以下哪些是原色？",
+      "type": "multiple",
+      "duration": 30,
+      "points": 15,
+      "correctAnswers": ["1", "3", "4"],
+      "answers": [
+        {
+          "id": 1,
+          "text": "红色",
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "text": "绿色",
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "text": "蓝色",
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "text": "黄色",
+          "isCorrect": true
+        },
+        {
+          "id": 5,
+          "text": "紫色",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "1744798001003",
+      "text": "'水在海平面上的沸点是100°C'这个说法正确吗？",
+      "type": "judgement",
+      "duration": 15,
+      "points": 5,
+      "correctAnswers": ["1"],
+      "answers": [
+        {
+          "id": 1,
+          "text": "正确",
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "text": "错误",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "1744798001004",
+      "text": "哪个行星被称为'红色星球'？",
+      "type": "single",
+      "duration": 20,
+      "points": 10,
+      "correctAnswers": ["2"],
+      "answers": [
+        {
+          "id": 1,
+          "text": "地球",
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "text": "火星",
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "text": "木星",
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "text": "金星",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "id": "1744798001005",
+      "text": "以下哪些动物是哺乳动物？",
+      "type": "multiple",
+      "duration": 25,
+      "points": 15,
+      "correctAnswers": ["1", "3", "5"],
+      "answers": [
+        {
+          "id": 1,
+          "text": "海豚",
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "text": "鳄鱼",
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "text": "蝙蝠",
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "text": "鲨鱼",
+          "isCorrect": false
+        },
+        {
+          "id": 5,
+          "text": "鲸鱼",
+          "isCorrect": true
+        }
+      ]
+    }
+  ]
+}

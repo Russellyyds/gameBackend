@@ -1,0 +1,7 @@
+image: comp1531/basic:latest
+stages:
+  - checks
+linechecking:
+  stage: checks
+  script:
+    - bash ./util/pre-commit.sh
