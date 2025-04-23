@@ -2,9 +2,29 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import fs from 'fs';
+import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 
-import swaggerDocument from '../swagger.json';
+// 尝试加载swagger文档，处理可能的路径问题
+let swaggerDocument;
+try {
+  // 尝试按相对路径加载
+  swaggerDocument = JSON.parse(fs.readFileSync(path.join(process.cwd(), '..', 'swagger.json'), 'utf8'));
+} catch (err) {
+  try {
+    // 如果相对路径失败，尝试从当前目录加载
+    swaggerDocument = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'swagger.json'), 'utf8'));
+  } catch (err2) {
+    console.warn('Warning: Could not load swagger.json file. API docs will not be available.');
+    // 提供一个最小的swagger文档以避免错误
+    swaggerDocument = {
+      "swagger": "2.0",
+      "info": { "title": "Game Backend API", "version": "1.0.0" },
+      "paths": {}
+    };
+  }
+}
+
 import { AccessError, InputError, } from './error';
 import {
   assertOwnsGame,
@@ -149,9 +169,7 @@ app.get('/play/:playerid/answer', catchErrors(async (req, res) => {
 app.put('/play/:playerid/answer', catchErrors(async (req, res) => {
   const { playerid, } = req.params;
   const { answers, } = req.body;
-  console.log("beicall")
   await submitAnswers(playerid, answers);
-  console.log(answers)
   return res.status(200).send({});
 }));
 
@@ -168,12 +186,18 @@ app.get('/', (req, res) => res.redirect('/docs'));
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-const configData = JSON.parse(fs.readFileSync('../frontend/backend.config.json', 'utf8'));
-const port = 'BACKEND_PORT' in configData ? configData.BACKEND_PORT : 5000;
+// 环境配置 - 使用环境变量而不是配置文件
+// 在Vercel环境中配置文件可能无法正常访问
+const port = process.env.PORT || process.env.BACKEND_PORT || 3000;
+
+// 添加健康检查端点，有助于验证服务是否正常运行
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 const server = app.listen(port, () => {
   console.log(`Backend is now listening on port ${port}!`);
-  console.log(`For API docs, navigate to http://localhost:${port}`);
+  console.log(`For API docs, navigate to http://localhost:${port}/docs`);
 });
 
 export default server;

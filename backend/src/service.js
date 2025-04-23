@@ -1,12 +1,19 @@
 import AsyncLock from "async-lock";
 import fs from "fs";
+import path from "path";
 import jwt from "jsonwebtoken";
 import { AccessError, InputError } from "./error";
 
 const lock = new AsyncLock();
 
 const JWT_SECRET = "llamallamaduck";
-const DATABASE_FILE = "./database.json";
+// 支持Vercel环境，使用/tmp目录作为数据存储位置
+const isVercel = process.env.VERCEL === '1';
+const DATABASE_FILE = isVercel 
+  ? path.join('/tmp', 'database.json')
+  : path.join(process.cwd(), 'database.json');
+
+console.log(`[DB] Using database file: ${DATABASE_FILE}`);
 
 /***************************************************************
                       State Management
@@ -18,12 +25,32 @@ let sessions = {};
 
 const sessionTimeouts = {};
 
+// 确保目录存在
+const ensureDirectoryExists = (filePath) => {
+  const dirname = path.dirname(filePath);
+  if (fs.existsSync(dirname)) {
+    return true;
+  }
+  try {
+    fs.mkdirSync(dirname, { recursive: true });
+    return true;
+  } catch (err) {
+    console.error(`[DB] Failed to create directory ${dirname}:`, err);
+    return false;
+  }
+};
+
 const update = (admins, games, sessions) =>
   new Promise((resolve, reject) => {
     lock.acquire("saveData", () => {
       try {
+        // 确保目录存在
+        ensureDirectoryExists(DATABASE_FILE);
+        
+        // 使用临时文件避免写入中断导致数据损坏
+        const tempFile = `${DATABASE_FILE}.tmp`;
         fs.writeFileSync(
-          DATABASE_FILE,
+          tempFile,
           JSON.stringify(
             {
               admins,
@@ -34,9 +61,12 @@ const update = (admins, games, sessions) =>
             2
           )
         );
+        fs.renameSync(tempFile, DATABASE_FILE);
+        console.log(`[DB] Data saved successfully to ${DATABASE_FILE}`);
         resolve();
-      } catch {
-        reject(new Error("Writing to database failed"));
+      } catch (error) {
+        console.error("[DB] Error writing to database:", error);
+        reject(new Error(`Writing to database failed: ${error.message}`));
       }
     });
   });
@@ -49,13 +79,24 @@ export const reset = () => {
   sessions = {};
 };
 
+// 加载数据库文件
 try {
-  const data = JSON.parse(fs.readFileSync(DATABASE_FILE));
-  admins = data.admins;
-  games = data.games;
-  sessions = data.sessions;
-} catch {
-  console.log("WARNING: No database found, create a new one");
+  if (fs.existsSync(DATABASE_FILE)) {
+    console.log(`[DB] Loading existing database from ${DATABASE_FILE}`);
+    const data = JSON.parse(fs.readFileSync(DATABASE_FILE, 'utf8'));
+    admins = data.admins || {};
+    games = data.games || {};
+    sessions = data.sessions || {};
+    console.log(`[DB] Database loaded successfully with ${Object.keys(admins).length} admins, ${Object.keys(games).length} games, and ${Object.keys(sessions).length} sessions`);
+  } else {
+    console.log(`[DB] No database found at ${DATABASE_FILE}, creating a new one`);
+    ensureDirectoryExists(DATABASE_FILE);
+    save();
+  }
+} catch (error) {
+  console.error(`[DB] Failed to load database: ${error.message}`);
+  console.log("[DB] Creating a new database");
+  ensureDirectoryExists(DATABASE_FILE);
   save();
 }
 
@@ -265,8 +306,10 @@ export const advanceGame = (gameId) =>
           if (sessionTimeouts[session.id]) {
             clearTimeout(sessionTimeouts[session.id]);
           }
+          // 在Vercel环境中，当定时器触发时保存状态变更
           sessionTimeouts[session.id] = setTimeout(() => {
             session.answerAvailable = true;
+            save(); // 确保状态变更被保存到数据库
           }, questionDuration * 1000);
         } catch (error) {
           reject(new InputError("Question duration not found"));
