@@ -188,16 +188,16 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // 环境配置 - 使用环境变量而不是配置文件
 // 在Vercel环境中配置文件可能无法正常访问
-const port = process.env.PORT || process.env.BACKEND_PORT || 3000;
+// const port = process.env.PORT || process.env.BACKEND_PORT || 3000;
 
-// 添加健康检查端点，有助于验证服务是否正常运行
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+// // 添加健康检查端点，有助于验证服务是否正常运行
+// app.get('/api/health', (req, res) => {
+//   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+// });
 
-const server = app.listen(port, () => {
-  console.log(`Backend is now listening on port ${port}!`);
-  console.log(`For API docs, navigate to http://localhost:${port}/docs`);
-});
+// const server = app.listen(port, () => {
+//   console.log(`Backend is now listening on port ${port}!`);
+//   console.log(`For API docs, navigate to http://localhost:${port}/docs`);
+// });
 
 export default server;
