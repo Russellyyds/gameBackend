@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "engines": {
+    "node": "20.17.0"
+  },
   "scripts": {
     "test": "jest test/*",
     "lint": "eslint src/*.js",
