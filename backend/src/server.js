@@ -200,4 +200,4 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //   console.log(`For API docs, navigate to http://localhost:${port}/docs`);
 // });
 
-export default server;
+export default app;
